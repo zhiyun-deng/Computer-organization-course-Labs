@@ -1,0 +1,19 @@
+description, approach, challenges, improvements
+2.1 pure c
+
+The code in C was very straightforward. The prompt was just to find the biggest number in the array through a for loop. As such, we simply cycled through and compared the number at each index with the current maximum. If the current index was bigger, we'd switch; nothing otherwise. There were no challenges in this portion, but we could have improved it by making it a one liner instruction or by including floats as well, but nothing realisitic within the scope of this assignment. 
+
+2.2 calling from c
+
+This was the same concept as the previous section, except we were asked to use
+a subroutine in assembly instead. This was very simple to use as well; we
+called on it as we would any other function in a library we might have
+imported. The only particularity to note was that the numbers passed would
+always be stored in register 0, which was to be expected by convention, but
+the result for the maximum at the end of the C program was stored in register
+4. This was an oddity that we were not able to figure out exactly, but we
+belive that it is just a quirk of the C compiler. However, this does mean that
+the program would not work if we did not use R0 and R1 in the subroutine.
+Beyond these small details, there were no challenges to deal with. We could
+maybe have improved the program by considering other data types, but this
+would probably have been unnecessary. 
