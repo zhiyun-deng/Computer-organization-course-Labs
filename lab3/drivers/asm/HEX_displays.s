@@ -1,0 +1,183 @@
+	.text
+	.equ SW_ADDRESS_ONE, 0xFF200020
+	.equ SW_ADDRESS_TWO, 0xFF200030
+	.global HEX_clear_ASM
+
+HEX_clear_ASM:
+	PUSH {R0-R4}//pushes register used
+	MOV R1, #127
+	MOV R2, #1		
+LOOP1:
+	CMP R2, #64
+	BEQ DONE
+	TST R0,R2
+	BNE CHOOSE_ADDRESS
+LOOP1_CONTINUED:
+	ROR R1, R1, #24
+	LSL R2, R2, #1
+	B LOOP1
+CHOOSE_ADDRESS:
+	CMP R2, #8
+	BGT SECOND_ADDRESS
+FIRST_ADDRESS:
+	LDR R3, =SW_ADDRESS_ONE
+	B WRITE
+SECOND_ADDRESS:
+	LDR R3, =SW_ADDRESS_TWO
+WRITE:
+	LDR R4, [R3]
+	BIC R4, R1
+	STR R4, [R3]
+	B LOOP1_CONTINUED
+
+DONE:
+	POP {R0-R4}
+	BX LR
+	
+
+	.global HEX_flood_ASM
+HEX_flood_ASM:
+	PUSH {R0-R4}//pushes register used
+	MOV R1, #127
+	
+	MOV R2, #1		
+LOOP2:
+	CMP R2, #64
+	BEQ DONE2
+	TST R0,R2
+	BNE CHOOSE_ADDRESS2
+LOOP2_CONTINUED:
+	ROR R1, R1, #24
+	LSL R2, R2, #1
+	B LOOP2
+CHOOSE_ADDRESS2:
+	CMP R2, #8
+	BGT SECOND_ADDRESS2
+FIRST_ADDRESS2:
+	LDR R3, =SW_ADDRESS_ONE
+	B WRITE2
+SECOND_ADDRESS2:
+	LDR R3, =SW_ADDRESS_TWO
+WRITE2:
+	LDR R4, [R3]
+	ORR R4, R1
+	STR R4, [R3]
+	B LOOP2_CONTINUED
+
+DONE2:
+	POP {R0-R4}
+	BX LR
+
+	.global HEX_write_ASM
+HEX_write_ASM:					
+	PUSH {R0-R4}//pushes register used
+	CMP R1, #0
+	BEQ display_0
+	CMP R1, #1
+	BEQ display_1
+	CMP R1, #2
+	BEQ display_2
+	CMP R1, #3
+	BEQ display_3
+	CMP R1, #4
+	BEQ display_4
+	CMP R1, #5
+	BEQ display_5
+	CMP R1, #6
+	BEQ display_6
+	CMP R1, #7
+	BEQ display_7
+	CMP R1, #8
+	BEQ display_8
+	CMP R1, #9
+	BEQ display_9
+	CMP R1, #10
+	BEQ display_10
+	CMP R1, #11
+	BEQ display_11
+	CMP R1, #12
+	BEQ display_12
+	CMP R1, #13
+	BEQ display_13
+	CMP R1, #14
+	BEQ display_14
+	CMP R1, #15
+	BEQ display_15
+display_0:MOV R1, #0x3F
+	B CONTINUE
+display_1:
+	MOV R1, #0x06
+	B CONTINUE
+display_2:
+	MOV R1, #0x5B
+	B CONTINUE
+display_3:
+	MOV R1, #0x4F
+	B CONTINUE
+display_4:
+	MOV R1, #0x66
+	B CONTINUE
+display_5:
+	MOV R1, #0x6D
+	B CONTINUE
+display_6:
+	MOV R1, #0x7D
+	B CONTINUE
+display_7:
+	MOV R1, #0x07
+	B CONTINUE
+display_8:
+	MOV R1, #0x7F
+	B CONTINUE
+display_9:
+	MOV R1, #0x6F
+	B CONTINUE
+display_10:
+	MOV R1, #0x77
+	B CONTINUE
+display_11:
+	MOV R1, #0x7C
+	B CONTINUE
+display_12:
+	MOV R1, #0x39
+	B CONTINUE
+display_13:
+	MOV R1, #0x5E
+	B CONTINUE
+display_14:
+	MOV R1, #0x79
+	B CONTINUE
+display_15:
+	MOV R1, #0x71
+	B CONTINUE
+
+CONTINUE:
+	MOV R2, #1		
+LOOP3:
+	CMP R2, #64
+	BEQ DONE3
+	TST R0,R2
+	BNE CHOOSE_ADDRESS3
+LOOP3_CONTINUED:
+	ROR R1, R1, #24
+	LSL R2, R2, #1
+	B LOOP3
+CHOOSE_ADDRESS3:
+	CMP R2, #8
+	BGT SECOND_ADDRESS3
+FIRST_ADDRESS3:
+	LDR R3, =SW_ADDRESS_ONE
+	B WRITE3
+SECOND_ADDRESS3:
+	LDR R3, =SW_ADDRESS_TWO
+WRITE3:
+	LDR R4, [R3]
+	ORR R4, R1
+	STR R4, [R3]
+	B LOOP3_CONTINUED
+
+DONE3:
+	POP {R0-R4}
+	BX LR
+
+		.end
