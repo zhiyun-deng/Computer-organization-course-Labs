@@ -4,9 +4,9 @@
 #include "./drivers/inc/pushbuttons.h"
 #include "./drivers/inc/HEX_displays.h"
 #include "./drivers/inc/HPS_TIM.h"
-
+#include "./drivers/inc/ISRs.h"
 int main(){
-/*
+
 	HEX_clear_ASM(HEX0|HEX1|HEX2|HEX3|HEX4|HEX5);
 	enable_PB_INT_ASM(0xFFFFFFFF);
 	while(1){
@@ -14,7 +14,7 @@ int main(){
 			HEX_clear_ASM(HEX0|HEX1|HEX2|HEX3|HEX4|HEX5); 
 			
 		}
-	HEX_flood_ASM(HEX4|HEX5)
+	HEX_flood_ASM(HEX4|HEX5);
 	enable_PB_INT_ASM(0xFFFFFFFF);
 	write_LEDs_ASM(read_slider_switches_ASM());
 	char x = read_slider_switches_ASM()& 0xF;
@@ -23,8 +23,8 @@ int main(){
 	HEX_write_ASM(y,x);
 	
 	
-	}*/
-HPS_TIM_config_t hps_tim;
+	}
+	/*HPS_TIM_config_t hps_tim;
 	hps_tim.tim = TIM0;
 	hps_tim.timeout = 10000; //1second??????????????
 	hps_tim.LD_en = 1;
@@ -66,7 +66,7 @@ HPS_TIM_config_t hps_tim;
 				}
 			}
 	HEX_clear_ASM(HEX0|HEX1|HEX2|HEX3|HEX4|HEX5);
-	HEX_write_ASM(HEX0,(ms % 100) / 10);
+	HEX_write_ASM(HEX0,(ms % 100) / 10)	;
 	HEX_write_ASM(HEX1, ms / 100 );
 	HEX_write_ASM(HEX2, (sec % 10) );
 	HEX_write_ASM(HEX3, (sec / 10) );
@@ -91,7 +91,88 @@ HPS_TIM_config_t hps_tim;
 				HEX_write_ASM(HEX0 | HEX1 | HEX2 | HEX3 | HEX4 | HEX5, 0);
 			}
 }
-}
+}*/
+	/*int_setup(2, (int[]) {73, 199 });
+	enable_PB_INT_ASM(PB0 | PB1 | PB2);
+	
+	HPS_TIM_config_t hps_tim;
+	hps_tim.tim = TIM0;
+	hps_tim.timeout = 10000; //1second??????????????
+	hps_tim.LD_en = 1;
+	hps_tim.INT_en = 1;
+	hps_tim.enable = 1;
+
+	HPS_TIM_config_ASM(&hps_tim); 
+
+
+	
+	HPS_TIM_config_t hps_tim_pb;
+	hps_tim_pb.tim = TIM1;
+	hps_tim_pb.timeout = 5000;//5 ms
+	hps_tim_pb.LD_en = 1;
+	hps_tim_pb.INT_en = 1;
+	hps_tim_pb.enable = 1;
+	HPS_TIM_config_ASM(&hps_tim_pb); 
+	
+	pb_int_flag=0;
+	int sec= 0;
+	int min=0;
+	int ms=0;
+	int isRunning=1;
+	while (1) {
+		
+		if (hps_tim0_int_flag && isRunning) {
+			hps_tim0_int_flag = 0;
+			ms += 10; 
+
+			
+			if (ms >= 1000) {
+				ms -= 1000;
+				sec++;
+				
+				if (sec >= 60) {
+					sec -= 60;
+					min++;
+					
+					if (min >= 60) {
+						min = 0;
+					}
+				}
+			}
+
+			HEX_clear_ASM(HEX0 | HEX1 | HEX2 | HEX3 | HEX4 | HEX5);
+			HEX_write_ASM(HEX0, ((ms % 100) / 10) );
+			HEX_write_ASM(HEX1, (ms / 100) );
+			HEX_write_ASM(HEX2, (sec % 10) );
+			HEX_write_ASM(HEX3, (sec / 10) );
+			HEX_write_ASM(HEX4, (min % 10) );
+			HEX_write_ASM(HEX5, (min / 10) );
+		}
+		
+		if (pb_int_flag != 0){
+			if(pb_int_flag == 1)
+				isRunning=1;
+			else if(pb_int_flag == 2)
+				isRunning = 0;
+			if((pb_int_flag == 4) && (isRunning==0)){
+				ms = 0;
+				sec = 0;
+				min = 0;
+				HEX_clear_ASM(HEX0 | HEX1 | HEX2 | HEX3 | HEX4 | HEX5);
+				HEX_write_ASM(HEX0, 0);
+				HEX_write_ASM(HEX1, 0);
+				HEX_write_ASM(HEX2, 0);
+				HEX_write_ASM(HEX3, 0);
+				HEX_write_ASM(HEX4, 0);
+				HEX_write_ASM(HEX5, 0);
+			}
+			pb_int_flag = 0;
+		}
+	}
+
+*/
+
+
 	return 0;
 }
 
