@@ -16,6 +16,13 @@
 	.global FPGA_JP2_ISR
 	.global FPGA_PS2_DUAL_ISR
 
+	.global hps_tim0_int_flag
+	.global pb_int_flag
+
+hps_tim0_int_flag:
+	.word 0x0
+pb_int_flag:
+	.word 0x0
 A9_PRIV_TIM_ISR:
 	BX LR
 	
@@ -55,7 +62,7 @@ FPGA_PB_KEYS_ISR:
 	LDR R1, =pb_int_flag
 	STR R0, [R1]				
 
-	BL PB_clear_edgecap_ASM		//clear edgecap
+	BL PB_clear_edgecp_ASM		//clear edgecap
 
 	POP {LR}
 	BX LR
