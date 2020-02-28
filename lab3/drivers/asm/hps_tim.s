@@ -10,19 +10,19 @@
 
 HPS_TIM_config_ASM:
 			PUSH {R1-R7}
-			LDR R3, [R0]				//Load TIM into R3
-			AND R3, R3, #0xF			//Get rid of random numbers ahead of our one-hot string
+			LDR R3, [R0]				//point to tim passed
+			AND R3, R3, #0xF			//isolate string
 			MOV R1, #0					//Initialize counter
 
 			
-HPS_TIM_config_ASM_LOOP:
-			CMP R1, #4					//if counter is greater than or equal to 4
-			BGE HPS_TIM_config_ASM_END	//done
+loop_config:
+			CMP R1, #4					//4 bases
+			BGE done_config	//done
 			AND R5, R3, #1
 			CMP R5, #0
 			ASR R3, R3, #1				//Shift input by 1
-			ADDEQ R1, R1, #1			//Increment counter if 0
-			BEQ HPS_TIM_config_ASM_LOOP	//Branch back to loop if 0
+			ADDEQ R1, R1, #1			//Increment counter if 1
+			BEQ loop_config				//Branch back to loop too
 
 			//Load timer into R2, depending on selection (R1)
 			CMP R1, #0
@@ -57,28 +57,28 @@ HPS_TIM_config_ASM_LOOP:
 			STR R7, [R2, #0x8]			//Store into control
 
 			ADD R1, R1, #1				//Increment counter
-			B HPS_TIM_config_ASM_LOOP
+			B loop_config
 
 
-HPS_TIM_config_ASM_END:				//finished
+done_config:				//finished
 			POP {R1-R7}					//restore data
 			BX LR
 
 			
-HPS_TIM_read_ASM:
+HPS_TIM_read_ASM_INT:
 			PUSH {R1-R4}
 			AND R0, R0, #0xF			//Get rid of random numbers ahead of our one-hot string
 			MOV R1, #0					//Initialize counter
 
 			
-HPS_TIM_read_ASM_LOOP:
+loop_read:
 			CMP R1, #4					//if counter >= 4
-			BGE HPS_TIM_read_ASM_END	//done
+			BGE done_read	//done
 			AND R4, R0, #1
 			CMP R4, #0
 			ASR R0, R0, #1				//Shift input by 1
 			ADDEQ R1, R1, #1			//Increment counter if 0
-			BEQ HPS_TIM_read_ASM_LOOP	//Branch back to loop if 0
+			BEQ loop_read	//Branch back to loop if 0
 
 			//Load timer into R2 depending on which one it is
 			CMP R1, #0
@@ -92,9 +92,9 @@ HPS_TIM_read_ASM_LOOP:
 
 			LDR R3, [R2, #0x10]			//Load S-bit
 			AND R0, R3, #1
-			B HPS_TIM_read_ASM_END 	//Only supports single timer, so done
+			B done_read 	//Only supports single timer, so done
 
-HPS_TIM_read_ASM_END:
+done_read:
 			POP {R1-R4}
 			BX LR
 
@@ -103,14 +103,14 @@ HPS_TIM_clear_INT_ASM:
 			AND R0, R0, #0xF			//Get rid of random numbers ahead of our one-hot string
 			MOV R1, #0					//Initialize counter
 			
-HPS_TIM_clear_INT_ASM_LOOP:
+loop_clear:
 			CMP R1, #4					//if counter >= 4
-			BGE HPS_TIM_clear_INT_ASM_END	//goto done
+			BGE done_clear	//goto done
 			AND R4, R0, #1
 			CMP R4, #0
 			ASR R0, R0, #1				//Shift input by 1
 			ADDEQ R1, R1, #1			//Increment counter if 0
-			BEQ HPS_TIM_clear_INT_ASM_LOOP	//Branch back to loop if 0
+			BEQ loop_clear	//Branch back to loop if 0
 
 			//Load timer into R2 depending on which timer was selected
 			CMP R1, #0
@@ -125,9 +125,9 @@ HPS_TIM_clear_INT_ASM_LOOP:
 			LDR R4, [R2, #0xC]			//Reading F bit clears the entire timer 
 
 			ADD R1, R1, #1				//Increment counter
-			B HPS_TIM_clear_INT_ASM_LOOP
+			B loop_clear
 
-HPS_TIM_clear_INT_ASM_END:
+done_clear:
 			POP {R1-R4}
 			BX LR			
 
