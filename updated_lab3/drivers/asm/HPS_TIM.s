@@ -1,0 +1,148 @@
+	.text
+	.equ SW_BASE1, 0xFFC08000
+	.equ SW_BASE2, 0xFFC09000
+	.equ SW_BASE3, 0xFFD00000
+	.equ SW_BASE4, 0xFFD01000
+	
+	.global HPS_TIM_config_ASM
+HPS_TIM_config_ASM:		//given a struct pointer HPS_TIM_config_t, initialize a timer and set all proper variables
+	PUSH {R4-R7, LR}	
+	MOV R1, #0			
+	MOV R2, #1
+	LDR R7, [R0]		
+	B LOOP
+
+LOOP:
+	TST R7, R2, LSL R1
+	BEQ CONTINUE
+	BL CONFIG
+
+CONTINUE:
+	ADD R1, R1, #1
+	CMP R1, #4
+	BLT LOOP
+
+DONE:
+	POP {R4-R7, LR}
+	BX LR
+
+
+CONFIG:
+	PUSH {LR}
+	
+	LDR R3, =HPS_TIM_BASE
+	LDR R4, [R3, R1, LSL #2]
+	
+	BL DISABLE
+	BL SET_LOAD_VAL
+	BL SET_LOAD_BIT
+	BL SET_INT_BIT
+	BL SET_EN_BIT
+	
+	POP {LR}
+	BX LR 
+
+DISABLE:
+	LDR R5, [R4, #0x8]
+	AND R5, R5, #0xFFFFFFFE
+	STR R5, [R4, #0x8]
+	BX LR
+	
+SET_LOAD_VAL:
+	LDR R5, [R0, #0x4]
+	MOV R6, #25
+	MUL R5, R5, R6
+	CMP R1, #2
+	LSLLT R5, R5, #2
+	STR R5, [R4]
+	BX LR
+	
+SET_LOAD_BIT:
+	LDR R5, [R4, #0x8]
+	LDR R6, [R0, #0x8]
+	AND R5, R5, #0xFFFFFFFD
+	ORR R5, R5, R6, LSL #1
+	STR R5, [R4, #0x8]
+	BX LR
+	
+SET_INT_BIT:
+	LDR R5, [R4, #0x8]
+	LDR R6, [R0, #0xC]
+	EOR R6, R6, #0x00000001
+	AND R5, R5, #0xFFFFFFFB
+	ORR R5, R5, R6, LSL #2
+	STR R5, [R4, #0x8]
+	BX LR
+	
+SET_EN_BIT:
+	LDR R5, [R4, #0x8]
+	LDR R6, [R0, #0x10]
+	AND R5, R5, #0xFFFFFFFE
+	ORR R5, R5, R6
+	STR R5, [R4, #0x8]
+	BX LR
+	
+	
+	
+
+	.global HPS_TIM_read_INT_ASM
+HPS_TIM_read_INT_ASM:
+	PUSH {R1-R6}//push register
+	MOV R1, R0
+	AND R1, R1, #0xF
+READ:
+	CMP R1, #1
+	LDREQ R3, =SW_BASE1
+	CMP R1, #2
+	LDREQ R3, =SW_BASE2
+	CMP R1, #4
+	LDREQ R3, =SW_BASE3
+	CMP R1, #8
+	LDREQ R3, =SW_BASE4
+	
+
+	LDR R4, [R3, #0x10]
+	AND R0, R4, #1
+DONE2:
+	POP {R1-R6}
+	BX LR
+
+
+
+
+	.global HPS_TIM_clear_INT_ASM
+
+HPS_TIM_clear_INT_ASM:
+	PUSH {R1-R6}//push register
+	LDR R1, [R0]
+	AND R1, R1, #0xF
+	MOV R2, #1
+LOOP3:
+	CMP R2, #16
+	BEQ DONE3
+
+	TST R1, R2
+	BEQ CLEAR
+	
+DONE3:
+	POP {R1-R6}
+	BX LR
+CLEAR:
+	CMP R2, #1
+	LDREQ R3, =SW_BASE1
+	CMP R2, #2
+	LDREQ R3, =SW_BASE2
+	CMP R2, #4
+	LDREQ R3, =SW_BASE3
+	CMP R2, #8
+	LDREQ R3, =SW_BASE4
+	
+	
+	LDR R4, [R3, #0xC]//read F bit, clears timer
+	LSL R2, R2, #1
+	B LOOP3
+	
+HPS_TIM_BASE:
+	.word 0xFFC08000, 0xFFC09000, 0xFFD00000, 0xFFD01000
+	
+	.end
