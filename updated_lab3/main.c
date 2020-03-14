@@ -52,6 +52,7 @@ int main(){
 	if(HPS_TIM_read_INT_ASM(TIM0)&&isRunning){
 	HPS_TIM_clear_INT_ASM(TIM0);
 	ms += 10;
+
 }
 	if (ms >= 1000) {
 				ms -= 1000;
@@ -92,6 +93,8 @@ int main(){
 			}
 }
 }
+
+
 	/*int_setup(2, (int[]) {73, 199 });
 	enable_PB_INT_ASM(PB0 | PB1 | PB2);
 	
@@ -104,27 +107,17 @@ int main(){
 
 	HPS_TIM_config_ASM(&hps_tim); 
 
-
-	
-	HPS_TIM_config_t hps_tim_pb;
-	hps_tim_pb.tim = TIM1;
-	hps_tim_pb.timeout = 5000;//5 ms
-	hps_tim_pb.LD_en = 1;
-	hps_tim_pb.INT_en = 1;
-	hps_tim_pb.enable = 1;
-	HPS_TIM_config_ASM(&hps_tim_pb); 
-	
 	pb_int_flag=0;
 	int sec= 0;
 	int min=0;
 	int ms=0;
 	int isRunning=1;
+
 	while (1) {
 		
 		if (hps_tim0_int_flag && isRunning) {
 			hps_tim0_int_flag = 0;
 			ms += 10; 
-
 			
 			if (ms >= 1000) {
 				ms -= 1000;
@@ -148,13 +141,16 @@ int main(){
 			HEX_write_ASM(HEX4, (min % 10) );
 			HEX_write_ASM(HEX5, (min / 10) );
 		}
+
 		
 		if (pb_int_flag != 0){
-			if(pb_int_flag == 1)
+			if(pb_int_flag == 1){
 				isRunning=1;
-			else if(pb_int_flag == 2)
+			}
+			else if(pb_int_flag == 2){
 				isRunning = 0;
-			if((pb_int_flag == 4) && (isRunning==0)){
+			}
+			else if((pb_int_flag == 4) && (isRunning==0)){
 				ms = 0;
 				sec = 0;
 				min = 0;
@@ -169,7 +165,6 @@ int main(){
 			pb_int_flag = 0;
 		}
 	}
-
 */
 
 
